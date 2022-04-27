@@ -1,13 +1,18 @@
 package verticles;
 
 import io.vertx.core.AbstractVerticle;
+
 import io.vertx.core.Promise;
+
 import io.vertx.core.http.HttpServer;
+
 import io.vertx.core.json.JsonObject;
+
 import io.vertx.ext.web.Router;
+
 import io.vertx.ext.web.handler.BodyHandler;
 
-public class apiHandler extends AbstractVerticle {
+public class ApiHandler extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -33,12 +38,12 @@ public class apiHandler extends AbstractVerticle {
                     handler.response().end("Failed");
 
                 }
+
             });
 
         });
 
         httpServer.requestHandler(router).listen(8080);
-
 
     }
 }

@@ -1,17 +1,21 @@
 package verticles;
 
 import io.vertx.core.AbstractVerticle;
+
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class DiscoveryVerticle extends AbstractVerticle {
 
     @Override
-    public void start(Promise<Void> startPromise) throws Exception {
+    public void start(Promise<Void> startPromise) {
 
-        pingDiscovery pingDiscovery = new pingDiscovery();
+        Discovery discovery = new Discovery();
+
+        final Logger LOG = LoggerFactory.getLogger(DiscoveryVerticle.class);
 
         vertx.eventBus().consumer("discovery",handler->{
 
@@ -21,7 +25,7 @@ public class DiscoveryVerticle extends AbstractVerticle {
 
                     try {
 
-                        result = pingDiscovery.ping(handler.body().toString());
+                        result = discovery.ping(handler.body().toString());
 
                     } catch (IOException e) {
 
@@ -30,9 +34,9 @@ public class DiscoveryVerticle extends AbstractVerticle {
                     }
                     if(result){
 
-                        boolean discovery = pingDiscovery.ssh(handler.body().toString());
+                        boolean outcome = discovery.ssh(handler.body().toString());
 
-                        if (discovery) {
+                        if (outcome) {
 
                             handler.reply("Successful Discovery");
 

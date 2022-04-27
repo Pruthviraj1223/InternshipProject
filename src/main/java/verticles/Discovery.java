@@ -3,11 +3,14 @@ package verticles;
 import io.vertx.core.json.JsonObject;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
+
 import java.io.InputStreamReader;
+
 import java.util.ArrayList;
 
-public class pingDiscovery {
+public class Discovery {
     public boolean ping(String jsonString) throws IOException {
 
         JsonObject jsonObject = new JsonObject(jsonString);
@@ -49,13 +52,11 @@ public class pingDiscovery {
 
         output = bufferedReader.readLine();
 
-        System.out.println(output);
-
         String []arr = output.split(":")[1].split("=")[1].split(",")[0].split("/");
 
-        String val = arr[2].substring(0,arr[2].length()-1);
+        String loss = arr[2].substring(0,arr[2].length()-1);
 
-        return val.equalsIgnoreCase("0");
+        return loss.equalsIgnoreCase("0");
 
     }
 
