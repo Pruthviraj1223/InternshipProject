@@ -1,5 +1,6 @@
 package verticles;
 
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 import java.io.BufferedReader;
@@ -11,9 +12,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Discovery {
-    public boolean ping(String jsonString) throws IOException {
-
-        JsonObject jsonObject = new JsonObject(jsonString);
+    public boolean ping(JsonObject jsonObject) throws IOException {
 
         System.out.println("Ip = " + jsonObject.getString("ip"));
 
@@ -60,7 +59,7 @@ public class Discovery {
 
     }
 
-    public boolean ssh(String jsonString){
+    public boolean ssh(JsonObject jsonObject){
         return true;
     }
 

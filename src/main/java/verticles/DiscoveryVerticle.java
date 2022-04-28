@@ -3,10 +3,13 @@ package verticles;
 import io.vertx.core.AbstractVerticle;
 
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DiscoveryVerticle extends AbstractVerticle {
 
@@ -21,24 +24,49 @@ public class DiscoveryVerticle extends AbstractVerticle {
 
                 vertx.executeBlocking(req->{
 
-                    boolean result;
+                    JsonObject jsonObject;
+
+                    boolean result = false;
 
                     try {
 
-                        result = discovery.ping(handler.body().toString());
+                        jsonObject = new JsonObject(handler.body().toString());
 
-                    } catch (IOException e) {
+                        Connection connection = Database.con;
+
+                        if(!Database.checkIp(connection,jsonObject)) {
+                            result = discovery.ping(jsonObject);
+                        }else{
+                            handler.reply("Already discovered");
+                        }
+                    } catch (IOException | SQLException e) {
 
                         throw new RuntimeException(e);
 
                     }
                     if(result){
 
-                        boolean outcome = discovery.ssh(handler.body().toString());
+                        boolean outcome = discovery.ssh(jsonObject);
 
                         if (outcome) {
 
-                            handler.reply("Successful Discovery");
+                            vertx.eventBus().request("database",jsonObject, data->{
+
+                                Object response = data.result().body();
+
+                                LOG.debug("Result  {} ", response);
+
+                                if(response.toString().equalsIgnoreCase("true")){
+
+                                    handler.reply("success Discovery " + " Added in database");
+                                }
+                                else {
+
+                                    handler.reply("Already exists in database");
+                                }
+
+                            });
+
 
                         } else {
 
@@ -53,7 +81,8 @@ public class DiscoveryVerticle extends AbstractVerticle {
                     }
 
                 });
-
         });
+
+        startPromise.complete();
     }
 }

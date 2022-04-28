@@ -45,5 +45,6 @@ public class ApiHandler extends AbstractVerticle {
 
         httpServer.requestHandler(router).listen(8080);
 
+        startPromise.complete();
     }
 }
