@@ -2,8 +2,6 @@ package verticles;
 
 import io.vertx.core.Vertx;
 
-import java.util.logging.LogManager;
-
 public class Bootstrap {
 
     public static void main(String[] args) {
@@ -12,20 +10,15 @@ public class Bootstrap {
 
         vertx.deployVerticle("verticles.ApiHandler").onComplete(handler ->
         {
-            vertx.deployVerticle("verticles.DiscoveryVerticle").onComplete(handle1 ->
+            vertx.deployVerticle("verticles.DiscoveryVerticle").onComplete(discoveryHandler ->
             {
-                vertx.deployVerticle("verticles.DatabaseVerticle").onComplete(han ->
+                vertx.deployVerticle("verticles.DatabaseVerticle").onComplete(databaseHandler ->
                 {
-                    if (han.succeeded())
-                    {
+                    if (databaseHandler.succeeded()) {
                         System.out.println("deployed successfully");
                     }
                 });
-
             });
         });
-
-
-
     }
 }

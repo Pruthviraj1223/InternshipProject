@@ -3,12 +3,17 @@ package verticles;
 import io.vertx.core.AbstractVerticle;
 
 import io.vertx.core.Promise;
+
 import io.vertx.core.json.JsonObject;
+
 import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
 import java.sql.Connection;
+
 import java.sql.SQLException;
 
 public class DiscoveryVerticle extends AbstractVerticle {
@@ -32,13 +37,16 @@ public class DiscoveryVerticle extends AbstractVerticle {
 
                         jsonObject = new JsonObject(handler.body().toString());
 
-                        Connection connection = Database.con;
+                        if(!Database.checkIp(jsonObject)) {
 
-                        if(!Database.checkIp(connection,jsonObject)) {
                             result = discovery.ping(jsonObject);
+
                         }else{
+
                             handler.reply("Already discovered");
+
                         }
+
                     } catch (IOException | SQLException e) {
 
                         throw new RuntimeException(e);
@@ -46,9 +54,11 @@ public class DiscoveryVerticle extends AbstractVerticle {
                     }
                     if(result){
 
-                        boolean outcome = discovery.ssh(jsonObject);
+                        String outcome = discovery.plugin(jsonObject);
 
-                        if (outcome) {
+                        boolean answer= outcome.equalsIgnoreCase("true");
+
+                        if (answer) {
 
                             vertx.eventBus().request("database",jsonObject, data->{
 
@@ -59,18 +69,19 @@ public class DiscoveryVerticle extends AbstractVerticle {
                                 if(response.toString().equalsIgnoreCase("true")){
 
                                     handler.reply("success Discovery " + " Added in database");
+
                                 }
                                 else {
 
                                     handler.reply("Already exists in database");
+
                                 }
 
                             });
 
-
                         } else {
 
-                            handler.reply("Failed SSH Discovery");
+                            handler.reply("Failed SSH Discovery " + " Error is " + outcome);
 
                         }
 
@@ -84,5 +95,7 @@ public class DiscoveryVerticle extends AbstractVerticle {
         });
 
         startPromise.complete();
+
     }
+
 }

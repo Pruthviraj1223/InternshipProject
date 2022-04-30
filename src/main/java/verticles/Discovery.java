@@ -1,6 +1,5 @@
 package verticles;
 
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 import java.io.BufferedReader;
@@ -10,11 +9,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class Discovery {
     public boolean ping(JsonObject jsonObject) throws IOException {
 
-        System.out.println("Ip = " + jsonObject.getString("ip"));
 
         ArrayList<String> commands = new ArrayList<>();
 
@@ -59,8 +58,40 @@ public class Discovery {
 
     }
 
-    public boolean ssh(JsonObject jsonObject){
-        return true;
+    public String plugin(JsonObject user){
+
+        user.put("category","discovery");
+
+        JsonObject jsonObject = user;
+
+        String encoded = Base64.getEncoder().encodeToString(jsonObject.toString().getBytes());
+
+        ProcessBuilder processBuilder = new ProcessBuilder().command("./plugin.exe",encoded);
+
+        String output = "";
+
+        try {
+            Process process = processBuilder.start();
+
+            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream()); //read the output
+
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            output = bufferedReader.readLine();
+
+            process.waitFor();
+
+            bufferedReader.close();
+
+            process.destroy();
+
+        } catch (IOException | InterruptedException e) {
+
+            e.printStackTrace();
+
+        }
+
+        return output;
     }
 
 }

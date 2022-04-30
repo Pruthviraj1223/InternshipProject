@@ -6,8 +6,9 @@ import java.sql.*;
 
 public class Database {
 
-    public static Connection con;
-    public static Connection connection() throws SQLException, ClassNotFoundException {
+    static Connection con;
+
+    static void connection() throws SQLException, ClassNotFoundException {
 
         Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -20,26 +21,28 @@ public class Database {
         ResultSet tables = dbm.getTables(null, null, "Discovery", null);
 
         if (!tables.next()) {
+
             stmt.executeUpdate("create table Discovery (port int,ip varchar(255),name varchar(255),password varchar(255),metricType varchar(255))");
+
         }
-
-        return con;
-
     }
 
-    public static boolean checkIp(Connection connection,JsonObject jsonObject) throws SQLException {
+
+     static boolean checkIp(JsonObject jsonObject) throws SQLException {
+
         String query = "select * from Discovery where ip='" + jsonObject.getString("ip") + "'";
 
-        ResultSet resultSet = connection.createStatement().executeQuery(query);
+        ResultSet resultSet = con.createStatement().executeQuery(query);
 
         return resultSet.next();
+
     }
 
-    public static boolean insert(Connection connection, JsonObject jsonObject) throws SQLException {
+     static boolean insert(JsonObject jsonObject) throws SQLException {
 
+        if(!checkIp(jsonObject)) {
 
-        if(!checkIp(connection,jsonObject)) {
-            PreparedStatement preparedStatement = connection.prepareStatement("insert into Discovery (port,name,password,ip,metricType) values (?,?,?,?,?)");
+            PreparedStatement preparedStatement = con.prepareStatement("insert into Discovery (port,name,password,ip,metricType) values (?,?,?,?,?)");
 
             preparedStatement.setInt(1, jsonObject.getInteger("port"));
 
@@ -56,7 +59,9 @@ public class Database {
             return true;
 
         }else{
+
             return false;
+
         }
     }
 
