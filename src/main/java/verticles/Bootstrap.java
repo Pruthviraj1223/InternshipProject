@@ -1,5 +1,6 @@
 package verticles;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 
 public class Bootstrap {

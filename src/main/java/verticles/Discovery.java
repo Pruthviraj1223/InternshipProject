@@ -14,7 +14,6 @@ import java.util.Base64;
 public class Discovery {
     public boolean ping(JsonObject jsonObject) throws IOException {
 
-
         ArrayList<String> commands = new ArrayList<>();
 
         commands.add("fping");
@@ -60,17 +59,20 @@ public class Discovery {
 
     public String plugin(JsonObject user){
 
-        user.put("category","discovery");
+        JsonObject jsonObject = new JsonObject(user.toString());
 
-        JsonObject jsonObject = user;
+        jsonObject.put("category","discovery");
 
         String encoded = Base64.getEncoder().encodeToString(jsonObject.toString().getBytes());
 
-        ProcessBuilder processBuilder = new ProcessBuilder().command("./plugin.exe",encoded);
+        ProcessBuilder processBuilder = new ProcessBuilder().command("/home/pruthviraj/InternshipProject/plugin.exe",encoded);
 
         String output = "";
 
         try {
+
+            processBuilder.redirectErrorStream(true);
+
             Process process = processBuilder.start();
 
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream()); //read the output

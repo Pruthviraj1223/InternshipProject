@@ -19,19 +19,25 @@ public class DatabaseVerticle extends AbstractVerticle {
 
             JsonObject jsonObject = new JsonObject(handler.body().toString());
 
-            boolean result;
+            vertx.executeBlocking(req->{
+                boolean result;
 
-            try {
+                try {
 
-                result = Database.insert(jsonObject);
+                    result = Database.insert(jsonObject);
 
-            } catch (SQLException e) {
+                } catch (SQLException e) {
 
-                throw new RuntimeException(e);
+                    throw new RuntimeException(e);
 
-            }
+                }
 
-            handler.reply(result);
+                handler.reply(result);
+
+//                handler.fail();
+
+            });
+
 
         });
 

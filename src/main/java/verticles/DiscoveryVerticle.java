@@ -27,19 +27,20 @@ public class DiscoveryVerticle extends AbstractVerticle {
 
         vertx.eventBus().consumer("discovery",handler->{
 
-                vertx.executeBlocking(req->{
 
-                    JsonObject jsonObject;
+            JsonObject jsonObject = new JsonObject(handler.body().toString());
+
+
+
+                vertx.executeBlocking(req->{
 
                     boolean result = false;
 
                     try {
 
-                        jsonObject = new JsonObject(handler.body().toString());
-
                         if(!Database.checkIp(jsonObject)) {
 
-                            result = discovery.ping(jsonObject);
+                             result = discovery.ping(jsonObject);
 
                         }else{
 
@@ -52,6 +53,7 @@ public class DiscoveryVerticle extends AbstractVerticle {
                         throw new RuntimeException(e);
 
                     }
+
                     if(result){
 
                         String outcome = discovery.plugin(jsonObject);
@@ -79,9 +81,11 @@ public class DiscoveryVerticle extends AbstractVerticle {
 
                             });
 
+                            req.complete(jsonObject);
+
                         } else {
 
-                            handler.reply("Failed SSH Discovery " + " Error is " + outcome);
+                            handler.reply("Failed Discovery " + " Error is " + outcome);
 
                         }
 
@@ -89,7 +93,11 @@ public class DiscoveryVerticle extends AbstractVerticle {
 
                         handler.reply("Failed Ping discovery");
 
+
+
                     }
+
+
 
                 });
         });
